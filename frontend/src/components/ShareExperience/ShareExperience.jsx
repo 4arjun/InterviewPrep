@@ -845,11 +845,11 @@ const ShareExperience = () => {
                     checked={formData.showProfile}
                     onChange={handleInputChange}
                   />
-                  <span style={{ color: "black" }}>Show my name/profile with this experience</span>
-                  <small style={{ color: "black" }}>(Uncheck to post anonymously)</small>
+                  <span>Show my name/profile with this experience</span>
+                  <small>(Uncheck to post anonymously)</small>
                 </label>
 
-                <label style={{ color: "black" }} className="checkbox-label required">
+                <label className="checkbox-label required">
                   <input
                     type="checkbox"
                     name="agreeToTerms"
@@ -857,7 +857,7 @@ const ShareExperience = () => {
                     onChange={handleInputChange}
                     required
                   />
-                  <span style={{ color: "black" }}>I agree to the terms of use and community guidelines *</span>
+                  <span>I agree to the terms of use and community guidelines *</span>
                 </label>
               </div>
             </div>
