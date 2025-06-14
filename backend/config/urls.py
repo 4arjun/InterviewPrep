@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from leetcode_tracker import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/submit-experience/', views.submit_experience, name='submit_experience'),
+    path('api/experiences/', views.get_all_experiences, name='get_all_experiences'),
+    path('api/experiences/<int:experience_id>/', views.get_experience_by_id, name='get_experience_by_id'),
 ]

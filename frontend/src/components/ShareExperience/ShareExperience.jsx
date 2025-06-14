@@ -166,62 +166,42 @@ const ShareExperience = () => {
     setShowPreview(true);
   };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     if (!formData.agreeToTerms) {
       alert('Please agree to the terms and conditions to continue.');
       return;
     }
-    
+  
     setLoading(true);
-    
+  
     try {
-      // Get existing experiences from localStorage
-      const existingExperiences = JSON.parse(localStorage.getItem('experiences') || '[]');
-      
-      // Create new experience object
-      const newExperience = {
-        id: Date.now(), // Use timestamp as unique ID
-        company: formData.company,
-        role: formData.role,
-        college: formData.college,
-        year: formData.graduationYear,
-        offerType: formData.interviewType,
-        author: formData.showProfile ? user?.name || 'Anonymous' : 'Anonymous',
-        isAnonymous: !formData.showProfile,
-        date: new Date().toISOString(),
-        views: 0,
-        likes: 0,
-        difficulty: formData.difficultyRating,
-        tags: formData.tags,
-        rounds: formData.numberOfRounds,
-        finalOutcome: formData.finalOutcome,
-        package: formData.offeredPackage,
-        summary: formData.preparationStrategy,
-        preparationTime: formData.preparationTime,
-        // Add additional details
-        department: formData.department,
-        cgpa: formData.cgpa,
-        jobLocation: formData.jobLocation,
-        interviewMonth: formData.interviewMonth,
-        interviewYear: formData.interviewYear,
-        roundDetails: formData.rounds,
-        whatToDoDifferently: formData.whatToDoDifferently,
-        tipsForJuniors: formData.tipsForJuniors
-      };
-      
-      // Add new experience to the array
-      const updatedExperiences = [newExperience, ...existingExperiences];
-      
-      // Save to localStorage
-      localStorage.setItem('experiences', JSON.stringify(updatedExperiences));
-      
-      // Clear the draft
-      localStorage.removeItem('experienceDraft');
-      
+      const response = await fetch('http://127.0.0.1:8000/api/submit-experience/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          author: formData.showProfile ? user?.name || 'Anonymous' : 'Anonymous',
+          isAnonymous: !formData.showProfile,
+          date: new Date().toISOString(),
+          views: 0,
+          likes: 0,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to submit experience');
+      }
+  
+      const result = await response.json();
       alert('Experience shared successfully!');
-      navigate('/explore'); // Navigate to explore page instead of dashboard
+      localStorage.removeItem('experienceDraft');
+      navigate('/explore');
+  
     } catch (error) {
       console.error('Error saving experience:', error);
       alert('Failed to share experience. Please try again.');
@@ -229,6 +209,9 @@ const ShareExperience = () => {
       setLoading(false);
     }
   };
+  
+    
+
 
   // Predefined options
   const companies = [

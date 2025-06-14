@@ -3,6 +3,72 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import './ExploreExperiences.css';
 
+const AnimatedIcon = ({ icon, delay }) => (
+  <span className="ee-animated-icon" style={{ animationDelay: `${delay}s` }}>{icon}</span>
+);
+
+const ExperienceCard = ({ experience, onClick, expanded, onExpand }) => (
+  <div className={`ee-card${expanded ? ' expanded' : ''}`} onClick={() => onClick(experience.id)}>
+    <div className="ee-card-header">
+      <div className="ee-company-logo">
+        {experience.company ? experience.company[0] : '?'}
+      </div>
+      <div className="ee-card-title">
+        <h3>{experience.company}</h3>
+        <span className="ee-role">{experience.role}</span>
+      </div>
+      <div className={`ee-badge outcome ${experience.finalOutcome}`}>{
+        experience.finalOutcome === 'selected' ? '✅ Selected' :
+        experience.finalOutcome === 'rejected' ? '❌ Rejected' : '⏳ Waiting'
+      }</div>
+    </div>
+    <div className="ee-card-meta">
+      <span className="ee-meta-item"><i className="ee-icon">🎓</i> {experience.college}</span>
+      <span className="ee-meta-item"><i className="ee-icon">📅</i> {experience.year}</span>
+      <span className="ee-meta-item"><i className="ee-icon">🏷️</i> {experience.offerType}</span>
+      <span className="ee-meta-item"><i className="ee-icon">💰</i> {experience.package}</span>
+      <span className="ee-meta-item"><i className="ee-icon">⭐</i> {experience.difficulty}</span>
+      <span className="ee-meta-item"><i className="ee-icon">🔄</i> {experience.rounds} Rounds</span>
+      <span className="ee-meta-item"><i className="ee-icon">⏱️</i> {experience.preparationTime}</span>
+    </div>
+    <div className="ee-card-summary">{experience.summary}</div>
+    <div className="ee-card-tags">
+      {experience.tags.map(tag => (
+        <span className="ee-tag" key={tag}>{tag}</span>
+      ))}
+    </div>
+    <div className="ee-card-footer">
+      <div className="ee-author">
+        <span className="ee-avatar">{experience.isAnonymous ? 'A' : (experience.author?.[0] || '?')}</span>
+        <span className="ee-author-name">{experience.isAnonymous ? 'Anonymous' : experience.author}</span>
+        <span className="ee-date">{new Date(experience.date).toLocaleDateString()}</span>
+      </div>
+      <div className="ee-engagement">
+        <span className="ee-views">👁️ {experience.views}</span>
+        <span className="ee-likes">❤️ {experience.likes}</span>
+      </div>
+    </div>
+    <button className="ee-expand-btn" onClick={e => { e.stopPropagation(); onExpand(experience.id); }}>
+      {expanded ? 'Show Less ▲' : 'Preview ▼'}
+    </button>
+    <div className={`ee-card-details${expanded ? ' show' : ''}`}>{expanded && (
+      <div>
+        <div className="ee-details-section">
+          <h4>Preparation Strategy</h4>
+          <p>{experience.preparationStrategy}</p>
+        </div>
+        <div className="ee-details-section">
+          <h4>Tips for Juniors</h4>
+          <p>{experience.tipsForJuniors || 'No tips provided'}</p>
+        </div>
+        <button className="ee-view-full-btn" onClick={e => { e.stopPropagation(); onClick(experience.id); }}>
+          View Full Experience →
+        </button>
+      </div>
+    )}</div>
+  </div>
+);
+
 const ExploreExperiences = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -20,154 +86,46 @@ const ExploreExperiences = () => {
     sortBy: 'newest'
   });
   const [showFilters, setShowFilters] = useState(false);
-
-  // Mock data for demonstration
-  const mockExperiences = [
-    {
-      id: 1,
-      company: 'Google',
-      role: 'Software Engineer',
-      college: 'IIT Delhi',
-      year: 2024,
-      offerType: 'on-campus',
-      author: 'Rahul Sharma',
-      isAnonymous: false,
-      date: '2024-03-15',
-      views: 245,
-      likes: 45,
-      difficulty: 'Hard',
-      tags: ['DSA-heavy', 'System Design', 'Behavioral'],
-      rounds: 4,
-      finalOutcome: 'selected',
-      package: '45 LPA',
-      summary: 'Google SDE interview process with focus on algorithms, system design, and behavioral questions. Got selected with a great package!',
-      preparationTime: '3+ months'
-    },
-    {
-      id: 2,
-      company: 'Microsoft',
-      role: 'Product Manager',
-      college: 'IIT Bombay',
-      year: 2024,
-      offerType: 'off-campus',
-      author: 'Anonymous',
-      isAnonymous: true,
-      date: '2024-03-10',
-      views: 189,
-      likes: 32,
-      difficulty: 'Medium',
-      tags: ['Case Study', 'Behavioral', 'Product Sense'],
-      rounds: 3,
-      finalOutcome: 'selected',
-      package: '38 LPA',
-      summary: 'Microsoft PM role interview focusing on product thinking, case studies, and leadership scenarios.',
-      preparationTime: '1-3 months'
-    },
-    {
-      id: 3,
-      company: 'Amazon',
-      role: 'SDE Intern',
-      college: 'BITS Pilani',
-      year: 2024,
-      offerType: 'on-campus',
-      author: 'Priya Patel',
-      isAnonymous: false,
-      date: '2024-03-08',
-      views: 156,
-      likes: 28,
-      difficulty: 'Medium',
-      tags: ['DSA-heavy', 'Leadership Principles', 'Coding Round'],
-      rounds: 3,
-      finalOutcome: 'selected',
-      package: '1.2L/month',
-      summary: 'Amazon SDE internship interview with heavy focus on DSA and Amazon Leadership Principles.',
-      preparationTime: '1-3 months'
-    },
-    {
-      id: 4,
-      company: 'Tesla',
-      role: 'Software Engineer',
-      college: 'NIT Trichy',
-      year: 2024,
-      offerType: 'off-campus',
-      author: 'Anonymous',
-      isAnonymous: true,
-      date: '2024-03-05',
-      views: 234,
-      likes: 56,
-      difficulty: 'Hard',
-      tags: ['System Design', 'Behavioral', 'Technical Round'],
-      rounds: 5,
-      finalOutcome: 'selected',
-      package: '52 LPA',
-      summary: 'Tesla software engineer interview with emphasis on system design and innovative thinking.',
-      preparationTime: '3+ months'
-    },
-    {
-      id: 5,
-      company: 'Meta',
-      role: 'Data Scientist',
-      college: 'IIT Madras',
-      year: 2024,
-      offerType: 'referral',
-      author: 'Arjun Kumar',
-      isAnonymous: false,
-      date: '2024-03-01',
-      views: 198,
-      likes: 41,
-      difficulty: 'Hard',
-      tags: ['ML/AI', 'Statistics', 'Case Study'],
-      rounds: 4,
-      finalOutcome: 'rejected',
-      package: 'N/A',
-      summary: 'Meta Data Scientist interview with focus on ML algorithms, statistics, and product analytics.',
-      preparationTime: '3+ months'
-    },
-    {
-      id: 6,
-      company: 'Netflix',
-      role: 'Frontend Developer',
-      college: 'IIIT Hyderabad',
-      year: 2024,
-      offerType: 'off-campus',
-      author: 'Sneha Reddy',
-      isAnonymous: false,
-      date: '2024-02-28',
-      views: 167,
-      likes: 35,
-      difficulty: 'Medium',
-      tags: ['Frontend', 'React', 'System Design'],
-      rounds: 3,
-      finalOutcome: 'selected',
-      package: '42 LPA',
-      summary: 'Netflix frontend developer interview focusing on React, JavaScript fundamentals, and frontend system design.',
-      preparationTime: '1-3 months'
-    }
-  ];
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
-    // Load experiences from localStorage
+    // Fetch experiences from backend
     const fetchExperiences = async () => {
       setLoading(true);
       try {
-        // Get experiences from localStorage
-        const savedExperiences = JSON.parse(localStorage.getItem('experiences') || '[]');
-        
-        // If no saved experiences, use mock data
-        const experiencesToShow = savedExperiences.length > 0 ? savedExperiences : mockExperiences;
-        
-        setExperiences(experiencesToShow);
-        setFilteredExperiences(experiencesToShow);
+        const response = await fetch('http://127.0.0.1:8000/api/experiences/');
+        if (!response.ok) throw new Error('Failed to fetch experiences');
+        const data = await response.json();
+        const mapped = data.map(exp => ({
+          id: exp.id,
+          company: exp.company,
+          role: exp.role,
+          college: exp.college,
+          year: exp.graduation_year,
+          offerType: exp.interview_type,
+          author: exp.author_name,
+          isAnonymous: !exp.show_profile,
+          date: exp.created_at,
+          views: exp.views || 0,
+          likes: exp.likes || 0,
+          difficulty: exp.difficulty_rating,
+          tags: exp.tags || [],
+          rounds: exp.number_of_rounds,
+          finalOutcome: exp.final_outcome,
+          package: exp.offered_package,
+          summary: exp.preparation_strategy?.slice(0, 120) + '...',
+          preparationTime: exp.preparation_time,
+          preparationStrategy: exp.preparation_strategy,
+        }));
+        setExperiences(mapped);
+        setFilteredExperiences(mapped);
       } catch (error) {
-        console.error('Error loading experiences:', error);
-        // Fallback to mock data if there's an error
-        setExperiences(mockExperiences);
-        setFilteredExperiences(mockExperiences);
+        setExperiences([]);
+        setFilteredExperiences([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchExperiences();
   }, []);
 
@@ -177,8 +135,6 @@ const ExploreExperiences = () => {
 
   const applyFilters = () => {
     let filtered = [...experiences];
-
-    // Search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(exp =>
@@ -189,41 +145,27 @@ const ExploreExperiences = () => {
         exp.tags.some(tag => tag.toLowerCase().includes(searchTerm))
       );
     }
-
-    // Company filter
     if (filters.company) {
       filtered = filtered.filter(exp => exp.company === filters.company);
     }
-
-    // Role filter
     if (filters.role) {
       filtered = filtered.filter(exp => exp.role.toLowerCase().includes(filters.role.toLowerCase()));
     }
-
-    // College filter
     if (filters.college) {
       filtered = filtered.filter(exp => exp.college.toLowerCase().includes(filters.college.toLowerCase()));
     }
-
-    // Year filter
     if (filters.year) {
       filtered = filtered.filter(exp => exp.year.toString() === filters.year);
     }
-
-    // Offer Type filter
     if (filters.offerType) {
       filtered = filtered.filter(exp => exp.offerType === filters.offerType);
     }
-
-    // Tags filter
     if (filters.tags) {
       const selectedTags = filters.tags.toLowerCase();
       filtered = filtered.filter(exp =>
         exp.tags.some(tag => tag.toLowerCase().includes(selectedTags))
       );
     }
-
-    // Sorting
     switch (filters.sortBy) {
       case 'newest':
         filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -240,276 +182,143 @@ const ExploreExperiences = () => {
       default:
         break;
     }
-
     setFilteredExperiences(filtered);
   };
 
   const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFilters(prev => ({ ...prev, [field]: value }));
   };
 
   const clearFilters = () => {
     setFilters({
-      search: '',
-      company: '',
-      role: '',
-      college: '',
-      year: '',
-      offerType: '',
-      tags: '',
-      sortBy: 'newest'
+      search: '', company: '', role: '', college: '', year: '', offerType: '', tags: '', sortBy: 'newest'
     });
-  };
-
-  const handleExperienceClick = (experienceId) => {
-    navigate(`/experience/${experienceId}`);
   };
 
   const getUniqueValues = (field) => {
     return [...new Set(experiences.map(exp => exp[field]))].filter(Boolean);
   };
 
-  if (loading) {
-    return (
-      <div className="explore-container">
-        <div className="loading-state">
-          <h2>Loading experiences...</h2>
-          <div className="spinner"></div>
-        </div>
-      </div>
-    );
-  }
+  const handleExpand = (id) => {
+    setExpandedId(prev => prev === id ? null : id);
+  };
+
+  const handleCardClick = (experienceId) => {
+    navigate(`/experience/${experienceId}`);
+  };
 
   return (
-    <div className="explore-container">
-      {/* Header */}
-      <div className="explore-header">
-        <div className="header-content">
+    <div className="ee-explore-root">
+      <div className="ee-hero">
+        <div className="ee-hero-bg">
+          <AnimatedIcon icon="💡" delay={0} />
+          <AnimatedIcon icon="🚀" delay={0.2} />
+          <AnimatedIcon icon="🎯" delay={0.4} />
+          <AnimatedIcon icon="🏆" delay={0.6} />
+        </div>
+        <div className="ee-hero-content">
           <h1>Explore Interview Experiences</h1>
-          <p>Discover insights from {experiences.length} shared interview experiences</p>
+          <p>Real stories, real strategies. Get inspired and prepare smarter!</p>
+          <Link to="/share" className="ee-cta-btn">+ Share Your Experience</Link>
         </div>
-        <Link to="/share" className="share-btn">
-          + Share Your Experience
-        </Link>
       </div>
-
-      {/* Search and Filters */}
-      <div className="search-filters-section">
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search by company, role, college, or keywords..."
-            value={filters.search}
-            onChange={(e) => handleFilterChange('search', e.target.value)}
-            className="search-input"
-          />
-          <button className="search-btn">🔍</button>
+      <div className="ee-filters-bar">
+        <input
+          type="text"
+          className="ee-search-input"
+          placeholder="Search by company, role, college, or tags..."
+          value={filters.search}
+          onChange={e => handleFilterChange('search', e.target.value)}
+        />
+        <button className="ee-filters-toggle" onClick={() => setShowFilters(v => !v)}>
+          {showFilters ? 'Hide Filters ▲' : 'Show Filters ▼'}
+        </button>
+        <div className="ee-sort-select">
+          <label>Sort by:</label>
+          <select value={filters.sortBy} onChange={e => handleFilterChange('sortBy', e.target.value)}>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="most-liked">Most Liked</option>
+            <option value="most-viewed">Most Viewed</option>
+          </select>
         </div>
-
-        <div className="filter-controls">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="filter-toggle-btn"
-          >
-            Filters {showFilters ? '▲' : '▼'}
-          </button>
-          <div className="sort-control">
-            <label>Sort by:</label>
-            <select
-              value={filters.sortBy}
-              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="most-liked">Most Liked</option>
-              <option value="most-viewed">Most Viewed</option>
-            </select>
-          </div>
-        </div>
-
-        {showFilters && (
-          <div className="filters-panel">
-            <div className="filters-grid">
-              <div className="filter-group">
-                <label>Company</label>
-                <select
-                  value={filters.company}
-                  onChange={(e) => handleFilterChange('company', e.target.value)}
-                >
-                  <option value="">All Companies</option>
-                  {getUniqueValues('company').map(company => (
-                    <option key={company} value={company}>{company}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Role</label>
-                <input
-                  type="text"
-                  placeholder="e.g., Software Engineer"
-                  value={filters.role}
-                  onChange={(e) => handleFilterChange('role', e.target.value)}
-                />
-              </div>
-
-              <div className="filter-group">
-                <label>College</label>
-                <input
-                  type="text"
-                  placeholder="e.g., IIT Delhi"
-                  value={filters.college}
-                  onChange={(e) => handleFilterChange('college', e.target.value)}
-                />
-              </div>
-
-              <div className="filter-group">
-                <label>Year</label>
-                <select
-                  value={filters.year}
-                  onChange={(e) => handleFilterChange('year', e.target.value)}
-                >
-                  <option value="">All Years</option>
-                  {getUniqueValues('year').map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Offer Type</label>
-                <select
-                  value={filters.offerType}
-                  onChange={(e) => handleFilterChange('offerType', e.target.value)}
-                >
-                  <option value="">All Types</option>
-                  <option value="on-campus">On-campus</option>
-                  <option value="off-campus">Off-campus</option>
-                  <option value="referral">Referral</option>
-                  <option value="ppo">PPO</option>
-                  <option value="internship">Internship</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Tags</label>
-                <input
-                  type="text"
-                  placeholder="e.g., DSA-heavy, System Design"
-                  value={filters.tags}
-                  onChange={(e) => handleFilterChange('tags', e.target.value)}
-                />
-              </div>
+      </div>
+      {showFilters && (
+        <div className="ee-filters-panel animate-in">
+          <div className="ee-filters-grid">
+            <div className="ee-filter-group">
+              <label>Company</label>
+              <select value={filters.company} onChange={e => handleFilterChange('company', e.target.value)}>
+                <option value="">All</option>
+                {getUniqueValues('company').map(company => (
+                  <option key={company} value={company}>{company}</option>
+                ))}
+              </select>
             </div>
-
-            <div className="filter-actions">
-              <button onClick={clearFilters} className="clear-filters-btn">
-                Clear All Filters
-              </button>
-              <span className="results-count">
-                {filteredExperiences.length} experience{filteredExperiences.length !== 1 ? 's' : ''} found
-              </span>
+            <div className="ee-filter-group">
+              <label>Role</label>
+              <input type="text" value={filters.role} onChange={e => handleFilterChange('role', e.target.value)} placeholder="e.g. SDE" />
+            </div>
+            <div className="ee-filter-group">
+              <label>College</label>
+              <input type="text" value={filters.college} onChange={e => handleFilterChange('college', e.target.value)} placeholder="e.g. IIT" />
+            </div>
+            <div className="ee-filter-group">
+              <label>Year</label>
+              <select value={filters.year} onChange={e => handleFilterChange('year', e.target.value)}>
+                <option value="">All</option>
+                {getUniqueValues('year').map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <div className="ee-filter-group">
+              <label>Offer Type</label>
+              <select value={filters.offerType} onChange={e => handleFilterChange('offerType', e.target.value)}>
+                <option value="">All</option>
+                <option value="on-campus">On-campus</option>
+                <option value="off-campus">Off-campus</option>
+                <option value="referral">Referral</option>
+                <option value="ppo">PPO</option>
+                <option value="internship">Internship</option>
+              </select>
+            </div>
+            <div className="ee-filter-group">
+              <label>Tags</label>
+              <input type="text" value={filters.tags} onChange={e => handleFilterChange('tags', e.target.value)} placeholder="e.g. DSA, System Design" />
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Results */}
-      <div className="experiences-grid">
-        {filteredExperiences.length === 0 ? (
-          <div className="no-results">
+          <div className="ee-filter-actions">
+            <button className="ee-clear-btn" onClick={clearFilters}>Clear All</button>
+            <span className="ee-results-count">{filteredExperiences.length} found</span>
+          </div>
+        </div>
+      )}
+      <div className="ee-cards-grid">
+        {loading ? (
+          <div className="ee-loading">
+            <div className="ee-spinner"></div>
+            <span>Loading experiences...</span>
+          </div>
+        ) : filteredExperiences.length === 0 ? (
+          <div className="ee-no-results animate-in">
+            <div className="ee-no-results-illustration">😕</div>
             <h3>No experiences found</h3>
-            <p>Try adjusting your filters or search terms</p>
-            <button onClick={clearFilters} className="clear-filters-btn">
-              Clear Filters
-            </button>
+            <p>Try different filters or search terms.</p>
+            <button className="ee-clear-btn" onClick={clearFilters}>Clear Filters</button>
           </div>
         ) : (
-          filteredExperiences.map(experience => (
-            <div
-              key={experience.id}
-              className="experience-card"
-              onClick={() => handleExperienceClick(experience.id)}
-            >
-              <div className="card-header">
-                <div className="company-role">
-                  <h3>{experience.company}</h3>
-                  <p className="role">{experience.role}</p>
-                </div>
-                <div className="outcome-badge">
-                  <span className={`outcome ${experience.finalOutcome}`}>
-                    {experience.finalOutcome === 'selected' ? '✅ Selected' : 
-                     experience.finalOutcome === 'rejected' ? '❌ Rejected' : '⏳ Waiting'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="card-content">
-                <div className="experience-meta">
-                  <span className="college">{experience.college}</span>
-                  <span className="year">{experience.year}</span>
-                  <span className="offer-type">{experience.offerType}</span>
-                </div>
-
-                <p className="summary">{experience.summary}</p>
-
-                <div className="experience-details">
-                  <div className="detail-item">
-                    <span className="label">Rounds:</span>
-                    <span className="value">{experience.rounds}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">Difficulty:</span>
-                    <span className={`value difficulty ${experience.difficulty.toLowerCase()}`}>
-                      {experience.difficulty}
-                    </span>
-                  </div>
-                  {experience.package !== 'N/A' && (
-                    <div className="detail-item">
-                      <span className="label">Package:</span>
-                      <span className="value package">{experience.package}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="tags">
-                  {experience.tags.slice(0, 3).map(tag => (
-                    <span key={tag} className="tag">{tag}</span>
-                  ))}
-                  {experience.tags.length > 3 && (
-                    <span className="more-tags">+{experience.tags.length - 3} more</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="card-footer">
-                <div className="author-info">
-                  <span className="author">
-                    By {experience.isAnonymous ? 'Anonymous' : experience.author}
-                  </span>
-                  <span className="date">
-                    {new Date(experience.date).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="engagement">
-                  <span className="views">👁️ {experience.views}</span>
-                  <span className="likes">❤️ {experience.likes}</span>
-                </div>
-              </div>
-            </div>
+          filteredExperiences.map((exp, idx) => (
+            <ExperienceCard
+              key={exp.id}
+              experience={exp}
+              expanded={exp.id === expandedId}
+              onExpand={handleExpand}
+              onClick={handleCardClick}
+            />
           ))
         )}
       </div>
-
-      {/* Load More Button (if needed for pagination) */}
-      {filteredExperiences.length > 0 && filteredExperiences.length >= 6 && (
-        <div className="load-more-section">
-          <button className="load-more-btn">Load More Experiences</button>
-        </div>
-      )}
     </div>
   );
 };
