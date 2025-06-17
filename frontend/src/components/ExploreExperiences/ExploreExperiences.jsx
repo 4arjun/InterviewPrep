@@ -93,7 +93,7 @@ const ExploreExperiences = () => {
     const fetchExperiences = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/experiences/');
+        const response = await fetch('https://app-4510091842.europe-west1.run.app/api/experiences/');
         if (!response.ok) throw new Error('Failed to fetch experiences');
         const data = await response.json();
         const mapped = data.map(exp => ({

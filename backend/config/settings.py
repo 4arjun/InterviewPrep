@@ -56,9 +56,8 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # or your deployed frontend URL
-]
+CORS_ALLOW_ALL_ORIGINS = True 
+
 
 ROOT_URLCONF = 'config.urls'
 
