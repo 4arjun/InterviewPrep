@@ -208,116 +208,132 @@ const ExploreExperiences = () => {
   };
 
   return (
-    <div className="ee-explore-root">
-      <div className="ee-hero">
-        <div className="ee-hero-bg">
-          <AnimatedIcon icon="💡" delay={0} />
-          <AnimatedIcon icon="🚀" delay={0.2} />
-          <AnimatedIcon icon="🎯" delay={0.4} />
-          <AnimatedIcon icon="🏆" delay={0.6} />
-        </div>
-        <div className="ee-hero-content">
-          <h1>Explore Interview Experiences</h1>
-          <p>Real stories, real strategies. Get inspired and prepare smarter!</p>
-          <Link to="/share" className="ee-cta-btn">+ Share Your Experience</Link>
-        </div>
-      </div>
-      <div className="ee-filters-bar">
-        <input
-          type="text"
-          className="ee-search-input"
-          placeholder="Search by company, role, college, or tags..."
-          value={filters.search}
-          onChange={e => handleFilterChange('search', e.target.value)}
-        />
-        <button className="ee-filters-toggle" onClick={() => setShowFilters(v => !v)}>
-          {showFilters ? 'Hide Filters ▲' : 'Show Filters ▼'}
-        </button>
-        <div className="ee-sort-select">
-          <label>Sort by:</label>
-          <select value={filters.sortBy} onChange={e => handleFilterChange('sortBy', e.target.value)}>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="most-liked">Most Liked</option>
-            <option value="most-viewed">Most Viewed</option>
-          </select>
-        </div>
-      </div>
-      {showFilters && (
-        <div className="ee-filters-panel animate-in">
-          <div className="ee-filters-grid">
-            <div className="ee-filter-group">
-              <label>Company</label>
-              <select value={filters.company} onChange={e => handleFilterChange('company', e.target.value)}>
-                <option value="">All</option>
-                {getUniqueValues('company').map(company => (
-                  <option key={company} value={company}>{company}</option>
-                ))}
-              </select>
-            </div>
-            <div className="ee-filter-group">
-              <label>Role</label>
-              <input type="text" value={filters.role} onChange={e => handleFilterChange('role', e.target.value)} placeholder="e.g. SDE" />
-            </div>
-            <div className="ee-filter-group">
-              <label>College</label>
-              <input type="text" value={filters.college} onChange={e => handleFilterChange('college', e.target.value)} placeholder="e.g. IIT" />
-            </div>
-            <div className="ee-filter-group">
-              <label>Year</label>
-              <select value={filters.year} onChange={e => handleFilterChange('year', e.target.value)}>
-                <option value="">All</option>
-                {getUniqueValues('year').map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-            <div className="ee-filter-group">
-              <label>Offer Type</label>
-              <select value={filters.offerType} onChange={e => handleFilterChange('offerType', e.target.value)}>
-                <option value="">All</option>
-                <option value="on-campus">On-campus</option>
-                <option value="off-campus">Off-campus</option>
-                <option value="referral">Referral</option>
-                <option value="ppo">PPO</option>
-                <option value="internship">Internship</option>
-              </select>
-            </div>
-            <div className="ee-filter-group">
-              <label>Tags</label>
-              <input type="text" value={filters.tags} onChange={e => handleFilterChange('tags', e.target.value)} placeholder="e.g. DSA, System Design" />
-            </div>
+    <div className="ee-container">
+      {/* Animated Background */}
+      <div className="ee-bg-animation"></div>
+      
+      {/* Header Section */}
+      <div className="ee-header">
+        <Link to="/dashboard" className="ee-back-link">
+          <span className="icon">←</span>
+          Back to Dashboard
+        </Link>
+        
+        <div className="ee-hero">
+          <div className="ee-hero-bg">
+            <AnimatedIcon icon="💡" delay={0} />
+            <AnimatedIcon icon="🚀" delay={0.2} />
+            <AnimatedIcon icon="🎯" delay={0.4} />
+            <AnimatedIcon icon="🏆" delay={0.6} />
           </div>
-          <div className="ee-filter-actions">
-            <button className="ee-clear-btn" onClick={clearFilters}>Clear All</button>
-            <span className="ee-results-count">{filteredExperiences.length} found</span>
+          <div className="ee-hero-content">
+            <h1>Explore Interview Experiences</h1>
+            <p>Real stories, real strategies. Get inspired and prepare smarter!</p>
+            <Link to="/share" className="ee-cta-btn">+ Share Your Experience</Link>
           </div>
         </div>
-      )}
-      <div className="ee-cards-grid">
-        {loading ? (
-          <div className="ee-loading">
-            <div className="ee-spinner"></div>
-            <span>Loading experiences...</span>
+        
+        <div className="ee-filters-bar">
+          <input 
+            type="text" 
+            placeholder="Search experiences..." 
+            className="ee-search-input"
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+          />
+          <button className="ee-filters-toggle" onClick={() => setShowFilters(v => !v)}>
+            {showFilters ? 'Hide Filters ▲' : 'Show Filters ▼'}
+          </button>
+          <div className="ee-sort-select">
+            <label>Sort by:</label>
+            <select value={filters.sortBy} onChange={e => handleFilterChange('sortBy', e.target.value)}>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="most-liked">Most Liked</option>
+              <option value="most-viewed">Most Viewed</option>
+            </select>
           </div>
-        ) : filteredExperiences.length === 0 ? (
-          <div className="ee-no-results animate-in">
-            <div className="ee-no-results-illustration">😕</div>
-            <h3>No experiences found</h3>
-            <p>Try different filters or search terms.</p>
-            <button className="ee-clear-btn" onClick={clearFilters}>Clear Filters</button>
+        </div>
+        
+        {showFilters && (
+          <div className="ee-filters-panel animate-in">
+            <div className="ee-filters-grid">
+              <div className="ee-filter-group">
+                <label>Company</label>
+                <select value={filters.company} onChange={e => handleFilterChange('company', e.target.value)}>
+                  <option value="">All</option>
+                  {getUniqueValues('company').map(company => (
+                    <option key={company} value={company}>{company}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ee-filter-group">
+                <label>Role</label>
+                <input type="text" value={filters.role} onChange={e => handleFilterChange('role', e.target.value)} placeholder="e.g. SDE" />
+              </div>
+              <div className="ee-filter-group">
+                <label>College</label>
+                <input type="text" value={filters.college} onChange={e => handleFilterChange('college', e.target.value)} placeholder="e.g. IIT" />
+              </div>
+              <div className="ee-filter-group">
+                <label>Year</label>
+                <select value={filters.year} onChange={e => handleFilterChange('year', e.target.value)}>
+                  <option value="">All</option>
+                  {getUniqueValues('year').map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ee-filter-group">
+                <label>Offer Type</label>
+                <select value={filters.offerType} onChange={e => handleFilterChange('offerType', e.target.value)}>
+                  <option value="">All</option>
+                  <option value="on-campus">On-campus</option>
+                  <option value="off-campus">Off-campus</option>
+                  <option value="referral">Referral</option>
+                  <option value="ppo">PPO</option>
+                  <option value="internship">Internship</option>
+                </select>
+              </div>
+              <div className="ee-filter-group">
+                <label>Tags</label>
+                <input type="text" value={filters.tags} onChange={e => handleFilterChange('tags', e.target.value)} placeholder="e.g. DSA, System Design" />
+              </div>
+            </div>
+            <div className="ee-filter-actions">
+              <button className="ee-clear-btn" onClick={clearFilters}>Clear All</button>
+              <span className="ee-results-count">{filteredExperiences.length} found</span>
+            </div>
           </div>
-        ) : (
-          filteredExperiences.map((exp, idx) => (
-            <ExperienceCard
-              key={exp.id}
-              experience={exp}
-              expanded={exp.id === expandedId}
-              onExpand={handleExpand}
-              onClick={handleCardClick}
-            />
-          ))
         )}
+      </div>
+      
+      <div className="ee-main">
+        <div className="ee-cards-grid">
+          {loading ? (
+            <div className="ee-loading">
+              <div className="ee-spinner"></div>
+              <span>Loading experiences...</span>
+            </div>
+          ) : filteredExperiences.length === 0 ? (
+            <div className="ee-no-results animate-in">
+              <div className="ee-no-results-illustration">😕</div>
+              <h3>No experiences found</h3>
+              <p>Try different filters or search terms.</p>
+              <button className="ee-clear-btn" onClick={clearFilters}>Clear Filters</button>
+            </div>
+          ) : (
+            filteredExperiences.map((exp, idx) => (
+              <ExperienceCard
+                key={exp.id}
+                experience={exp}
+                expanded={exp.id === expandedId}
+                onExpand={handleExpand}
+                onClick={handleCardClick}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
