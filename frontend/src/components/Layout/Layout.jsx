@@ -55,7 +55,7 @@ const Layout = ({ children, title = "DSA Tracker", showSearch = false, onSearch 
                 <FiSearch className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="    Search..."
                   value={searchQuery}
                   onChange={handleSearchChange}
                   className="search-input"
